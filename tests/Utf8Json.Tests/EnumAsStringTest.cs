@@ -16,6 +16,25 @@ namespace Utf8Json.Tests
         BarBaz = 5,
         FooBarBaz = 6
     }
+    
+    public enum AsStringMember
+    {
+        [DataMember(Name = "F")]
+        Foo = 0,
+        Bar = 1,
+        Baz = 2,
+        [DataMember(Name = "FB")]
+        FooBar = 3,
+        FooBaz = 4,
+        [DataMember(Name = "BB")]
+        BarBaz = 5,
+        [DataMember(Name = "fbb")]
+        FOOBARBAZ = 6,
+        [DataMember(Name = "Wcs")]
+        WeirdCasing = 7,
+        [DataMember(Name = "eMwC")]
+        EvenMoreWeirdCasing = 8
+    }
 
     [Flags]
     public enum AsStringFlag
@@ -97,7 +116,7 @@ namespace Utf8Json.Tests
         }
 
         [Fact]
-        public void DataMemberTest()
+        public void DataMemberFlagsTest()
         {
             var xs = new[] {
                 (DataMemberFlag.Foo, "F"),
@@ -113,6 +132,26 @@ namespace Utf8Json.Tests
                 var v = JsonSerializer.ToJsonString(item.Item1);
                 v.Trim('\"').Is(item.Item2);
                 JsonSerializer.Deserialize<DataMemberFlag>(v).Is(item.Item1);
+            }
+        }
+        
+
+        [Fact]
+        public void DataMemberTest()
+        {
+            var xs = new[] {
+                (AsStringMember.Foo, "F"),
+                (AsStringMember.FooBar, "FB"),
+                (AsStringMember.BarBaz, "BB"),
+                (AsStringMember.FOOBARBAZ, "fbb"),
+                (AsStringMember.WeirdCasing, "Wcs"),
+                (AsStringMember.EvenMoreWeirdCasing, "eMwC")
+            };
+            foreach (var item in xs)
+            {
+                var v = JsonSerializer.ToJsonString(item.Item1);
+                v.Trim('\"').Is(item.Item2);
+                JsonSerializer.Deserialize<AsStringMember>(v).Is(item.Item1);
             }
         }
 
