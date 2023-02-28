@@ -1004,16 +1004,12 @@ namespace Utf8Json
                     break;
                 case JsonToken.String:
                     offset += 1; // position is "\"";
+
                     for (int i = offset; i < bytes.Length; i++)
                     {
-                        if (bytes[i] == (char)'\"')
+                        if (bytes[i] == '\"')
                         {
-                            // is escape and that escape is not escaped?
-                            if (bytes[i - 1] == (char)'\\' && bytes[i - 2] != (char)'\\')
-                            {
-                                continue;
-                            }
-                            else
+                            if (bytes[i - 1] != '\\')
                             {
                                 offset = i + 1;
                                 return; // end
