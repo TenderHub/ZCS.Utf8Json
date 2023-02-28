@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -280,14 +279,6 @@ namespace Utf8Json.Tests
                 var s = Utf8Json.JsonSerializer.Deserialize<RecursiveReadNextBlockOverflow>(a);
                 s.z.Is(99);
             }
-        }
-
-        [Fact]
-        public void Escaping()
-        {
-            var json = File.ReadAllBytes(@"C:\sources\json-escape-test.json");
-            var dest = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            Assert.True(dest.ContainsKey("name"));
         }
 
         [Fact]
