@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
 using Utf8Json.Internal.DoubleConversion;
 using Xunit;
@@ -52,13 +51,13 @@ namespace Utf8Json.Tests
             foreach (var item in x.Concat(new[] { double.Epsilon, double.MaxValue, double.MinValue }))
             {
                 var actual = GetString(item);
-                var y = double.Parse(actual, CultureInfo.InvariantCulture);
+                var y = double.Parse(actual);
                 var diff = Math.Abs((item - y) / item);
                 if (diff > 1E-15) throw new Exception(item + "      :   " + diff.ToString());
 
                 if (!(item == double.MaxValue || item == double.MinValue))
                 {
-                    var buf = Encoding.UTF8.GetBytes(item.ToString(CultureInfo.InvariantCulture));
+                    var buf = Encoding.UTF8.GetBytes(item.ToString());
                     var buf2 = Enumerable.Range(1, 100).Select(z => (byte)z).Concat(buf).ToArray();
                     var d2 = NumberConverter.ReadDouble(buf2, 100, out var _);
                     Approximately(y, d2).IsTrue();
@@ -94,7 +93,7 @@ namespace Utf8Json.Tests
             foreach (var item in y.Concat(new[] { float.Epsilon, float.MaxValue, float.MinValue }))
             {
                 var actual = GetString(item);
-                var y2 = float.Parse(actual, CultureInfo.InvariantCulture);
+                var y2 = float.Parse(actual);
                 var diff = Math.Abs((item - y2) / item);
                 if (diff > 2E-7) throw new Exception(item + "      :   " + diff.ToString());
 
