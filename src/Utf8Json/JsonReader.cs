@@ -13,6 +13,8 @@ namespace Utf8Json
 
     public struct JsonReader
     {
+        private const char ValueSeparator = ',';
+        
         static readonly ArraySegment<byte> nullTokenSegment = new ArraySegment<byte>(new byte[] { 110, 117, 108, 108 }, 0, 4);
         static readonly byte[] bom = Encoding.UTF8.GetPreamble();
 
@@ -122,7 +124,7 @@ namespace Utf8Json
                     case (byte)'t': return JsonToken.True;
                     case (byte)'f': return JsonToken.False;
                     case (byte)'n': return JsonToken.Null;
-                    case (byte)',': return JsonToken.ValueSeparator;
+                    case (byte)ValueSeparator: return JsonToken.ValueSeparator;
                     case (byte)':': return JsonToken.NameSeparator;
                     case (byte)'-': return JsonToken.Number;
                     case (byte)'0': return JsonToken.Number;
@@ -513,7 +515,7 @@ namespace Utf8Json
         public bool ReadIsValueSeparator()
         {
             SkipWhiteSpace();
-            if (IsInRange && bytes[offset] == ',')
+            if (IsInRange && bytes[offset] == ValueSeparator)
             {
                 offset += 1;
                 return true;
@@ -848,7 +850,7 @@ namespace Utf8Json
                 case (byte)'}':
                 case (byte)'[':
                 case (byte)']':
-                case (byte)',':
+                case (byte)ValueSeparator:
                 case (byte)':':
                 case (byte)'\"':
                     return true;
@@ -1009,7 +1011,8 @@ namespace Utf8Json
                     {
                         if (bytes[i] == '\"')
                         {
-                            if (bytes[i - 1] != '\\')
+                            
+                            if (bytes[i - 1] != '\\' && bytes[i - 1] != ValueSeparator)
                             {
                                 offset = i + 1;
                                 return; // end
