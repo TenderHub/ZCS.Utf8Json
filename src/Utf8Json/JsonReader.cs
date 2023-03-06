@@ -1007,39 +1007,11 @@ namespace Utf8Json
                 case JsonToken.String:
                     offset += 1; // position is "\"";
 
-                    var hasOpenQuotes = false;
-
                     for (int i = offset; i < bytes.Length; i++)
                     {
                         if (bytes[i] == '\"')
                         {
-                            var slashCount = 0;
 
-                            for (int j = i - 1; j > 0; j--)
-                            {
-                                if (bytes[j] == '\\')
-                                {
-                                    slashCount += 1;
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-
-                            if (slashCount > 0 && slashCount % 2 != 0)
-                            {
-                                if (!hasOpenQuotes)
-                                {
-                                    hasOpenQuotes = true;
-                                }
-                                // else
-                                // {
-                                //     offset = i + 1;
-                                //     return; // end
-                                // }
-                            }
-                            
                             if (bytes[i - 1] != '\\')
                             {
                                 offset = i + 1;
