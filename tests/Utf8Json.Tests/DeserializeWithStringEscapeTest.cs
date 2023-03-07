@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Utf8Json.Resolvers;
@@ -52,6 +53,17 @@ namespace Utf8Json.Tests
 			var res = Encoding.UTF8.GetString(wrapper);
 			
 			Assert.Equal(source, res);
+        }
+        
+        [InlineData("{\"value\": \"string \\\"inner\\\"\"}", "string \"inner\"")]
+        [InlineData("{\"value\": \"string \\\\\"inner\\\"\"}", "string \"inner\"")]
+        [Theory]
+        public void ShouldDeserializeProps(string source, string expected)
+        {
+            var resolver = CompositeResolver.Create(Array.Empty<IJsonFormatter>(), new[] { StandardResolver.SnakeCase });
+            var map = JsonSerializer.Deserialize<Dictionary<string, object>>(source, resolver);
+            
+            Assert.Equal(expected, map["value"]);
         }
     }
 }
