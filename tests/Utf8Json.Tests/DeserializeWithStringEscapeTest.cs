@@ -56,7 +56,7 @@ namespace Utf8Json.Tests
         }
         
         [InlineData("{\"value\": \"string \\\"inner\\\"\"}", "string \"inner\"")]
-        [InlineData("{\"value\": \"string \\\\\"inner\\\"\"}", "string \"inner\"")]
+        [InlineData("{\"value\": \"string \\\\\\\"inner\\\"\"}", "string \\\\\"inner\"")]
         [Theory]
         public void ShouldDeserializeProps(string source, string expected)
         {

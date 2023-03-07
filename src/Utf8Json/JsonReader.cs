@@ -574,7 +574,6 @@ namespace Utf8Json
                         switch ((char)bytes[i + 1])
                         {
                             case '"':
-                            case '\\':
                             case '/':
                                 escapeCharacter = bytes[i + 1];
                                 goto COPY;
@@ -593,6 +592,9 @@ namespace Utf8Json
                             case 't':
                                 escapeCharacter = (byte)'\t';
                                 goto COPY;
+                            case '\\':
+                                offset++;
+                                continue;
                             case 'u':
                                 if (codePointStringBuffer == null) codePointStringBuffer = StringBuilderCache.GetCodePointStringBuffer();
 
