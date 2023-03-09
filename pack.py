@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import base64
+
 import glob
 import os
 import subprocess
@@ -10,7 +10,6 @@ from urllib import request
 import argparse
 import pathlib
 import json
-import ssl
 
 
 class Package:
@@ -93,20 +92,11 @@ class Package:
         data = {"versions": []}
 
         try:
-            ctx = ssl.create_default_context()
-            ctx.check_hostname = False
-            ctx.verify_mode = ssl.CERT_NONE
-            header = "%s:%s" % (args.api_username, args.api_password)
-            header = base64.urlsafe_b64encode(bytes(header, "utf-8")).decode("utf-8")
-
             req = request.Request(
                 f"{args.api_url}/projects/{args.project_id}/packages/nuget/download/{self.id}/index",
-                headers={
-                    "Authorization": f"Basic {header}"
-                }
             )
 
-            with request.urlopen(req, context=ctx) as resp:
+            with request.urlopen(req) as resp:
                 code = resp.getcode()
                 data = json.loads(resp.read())
         except urllib.error.HTTPError as e:
@@ -130,6 +120,12 @@ class Package:
 
 
 def main(args: argparse.Namespace):
+    pwd_manager = request.HTTPPasswordMgrWithDefaultRealm()
+    pwd_manager.add_password(None, args.api_url, args.api_username, args.api_password)
+    auth_handler = request.HTTPBasicAuthHandler(pwd_manager)
+    opener = request.build_opener(auth_handler)
+    request.install_opener(opener)
+
     packages = dict()
 
     for f in glob.glob(os.getcwd() + "/**/*.csproj", recursive=True):
