@@ -13,6 +13,8 @@ namespace Utf8Json
 
     public struct JsonReader
     {
+        private const char ValueSeparator = ',';
+        
         static readonly ArraySegment<byte> nullTokenSegment = new ArraySegment<byte>(new byte[] { 110, 117, 108, 108 }, 0, 4);
         static readonly byte[] bom = Encoding.UTF8.GetPreamble();
 
@@ -122,7 +124,7 @@ namespace Utf8Json
                     case (byte)'t': return JsonToken.True;
                     case (byte)'f': return JsonToken.False;
                     case (byte)'n': return JsonToken.Null;
-                    case (byte)',': return JsonToken.ValueSeparator;
+                    case (byte)ValueSeparator: return JsonToken.ValueSeparator;
                     case (byte)':': return JsonToken.NameSeparator;
                     case (byte)'-': return JsonToken.Number;
                     case (byte)'0': return JsonToken.Number;
@@ -513,7 +515,7 @@ namespace Utf8Json
         public bool ReadIsValueSeparator()
         {
             SkipWhiteSpace();
-            if (IsInRange && bytes[offset] == ',')
+            if (IsInRange && bytes[offset] == ValueSeparator)
             {
                 offset += 1;
                 return true;
@@ -572,7 +574,6 @@ namespace Utf8Json
                         switch ((char)bytes[i + 1])
                         {
                             case '"':
-                            case '\\':
                             case '/':
                                 escapeCharacter = bytes[i + 1];
                                 goto COPY;
@@ -591,6 +592,9 @@ namespace Utf8Json
                             case 't':
                                 escapeCharacter = (byte)'\t';
                                 goto COPY;
+                            case '\\':
+                                offset++;
+                                continue;
                             case 'u':
                                 if (codePointStringBuffer == null) codePointStringBuffer = StringBuilderCache.GetCodePointStringBuffer();
 
@@ -848,7 +852,7 @@ namespace Utf8Json
                 case (byte)'}':
                 case (byte)'[':
                 case (byte)']':
-                case (byte)',':
+                case (byte)ValueSeparator:
                 case (byte)':':
                 case (byte)'\"':
                     return true;
@@ -1004,16 +1008,13 @@ namespace Utf8Json
                     break;
                 case JsonToken.String:
                     offset += 1; // position is "\"";
+
                     for (int i = offset; i < bytes.Length; i++)
                     {
-                        if (bytes[i] == (char)'\"')
+                        if (bytes[i] == '\"')
                         {
-                            // is escape and that escape is not escaped?
-                            if (bytes[i - 1] == (char)'\\' && bytes[i - 2] != (char)'\\')
-                            {
-                                continue;
-                            }
-                            else
+
+                            if (bytes[i - 1] != '\\')
                             {
                                 offset = i + 1;
                                 return; // end
