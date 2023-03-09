@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace Utf8Json.Tests;
@@ -7,7 +9,7 @@ public class FloatTest
 {
     [MemberData(nameof(FractionalData))]
     [Theory]
-    public void FractionalNumbers(string source, float target)
+    public void Deserialize_FractionalNumbers(string source, float target)
     {
         var instance = JsonSerializer.Deserialize<float>(source);
         instance.Is(target);
@@ -15,11 +17,28 @@ public class FloatTest
     
     [MemberData(nameof(RoundData))]
     [Theory]
-    public void RoundNumbers(string source, float target)
+    public void Deserialize_RoundNumbers(string source, float target)
     {
         var instance = JsonSerializer.Deserialize<float>(source);
         instance.Is(target);
     }
+    
+    [MemberData(nameof(Serialize_FractionalData))]
+    [Theory]
+    public void Serialize_FractionalNumbers(float source, string target)
+    {
+        var instance = Encoding.UTF8.GetString(JsonSerializer.Serialize(source));
+        instance.Is(target);
+    }
+    
+    [MemberData(nameof(Serialize_RoundData))]
+    [Theory]
+    public void Serialize_RoundNumbers(float source, string target)
+    {
+        var instance = Encoding.UTF8.GetString(JsonSerializer.Serialize(source));
+        instance.Is(target);
+    }
+
 
     public static IEnumerable<object[]> FractionalData = new List<object[]>
     {
@@ -37,6 +56,8 @@ public class FloatTest
         new object[] { "20000000050.654", 20000000050.654f },
         new object[] { "-984132156.987151", -984132156.987151f }
     };
+    
+    public static IEnumerable<object[]> Serialize_FractionalData = FractionalData.Select(p => new[] { p[1], p[0] });
         
     public static IEnumerable<object[]> RoundData = new List<object[]>
     {
@@ -57,4 +78,6 @@ public class FloatTest
         new object[] { "-984132156.0", -984132156f },
         new object[] { "-984132156", -984132156f }
     };
+    
+    public static IEnumerable<object[]> Serialize_RoundData = RoundData.Select(p => new[] { p[1], (p[0] as string).Replace(".0", string.Empty) });
 }

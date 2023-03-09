@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Xunit;
 
 namespace Utf8Json.Tests
@@ -43,7 +45,7 @@ namespace Utf8Json.Tests
 
         [MemberData(nameof(FractionalData))]
         [Theory]
-        public void FractionalNumbers(string source, decimal target)
+        public void Deserialize_FractionalNumbers(string source, decimal target)
         {
             var instance = JsonSerializer.Deserialize<decimal>(source);
             instance.Is(target);
@@ -51,9 +53,25 @@ namespace Utf8Json.Tests
         
         [MemberData(nameof(RoundData))]
         [Theory]
-        public void RoundNumbers(string source, decimal target)
+        public void Deserialize_RoundNumbers(string source, decimal target)
         {
             var instance = JsonSerializer.Deserialize<decimal>(source);
+            instance.Is(target);
+        }
+        
+        [MemberData(nameof(Serialize_FractionalData))]
+        [Theory]
+        public void Serialize_FractionalNumbers(decimal source, string target)
+        {
+            var instance = Encoding.UTF8.GetString(JsonSerializer.Serialize(source));
+            instance.Is(target);
+        }
+    
+        [MemberData(nameof(Serialize_RoundData))]
+        [Theory]
+        public void Serialize_RoundNumbers(decimal source, string target)
+        {
+            var instance = Encoding.UTF8.GetString(JsonSerializer.Serialize(source));
             instance.Is(target);
         }
 
@@ -74,6 +92,8 @@ namespace Utf8Json.Tests
             new object[] { "-984132156.987151", -984132156.987151m }
         };
         
+        public static IEnumerable<object[]> Serialize_FractionalData = FractionalData.Select(p => new[] { p[1], p[0] });
+
         public static IEnumerable<object[]> RoundData = new List<object[]>
         {
             new object[] { "123123123123123.0", 123123123123123m },
@@ -92,5 +112,7 @@ namespace Utf8Json.Tests
             new object[] { "20100030050.0", 20100030050m },
             new object[] { "-984132156.0", -984132156m }
         };
+        
+        public static IEnumerable<object[]> Serialize_RoundData = RoundData.Select(p => new[] { p[1], (p[0] as string).Replace(".0", string.Empty) });
     }
 }
