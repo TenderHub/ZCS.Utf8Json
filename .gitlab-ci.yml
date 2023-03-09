@@ -1,0 +1,12 @@
+image: registry.tenderhub.net/devops/docker/dotnet-sdk7/sdk:latest #pommalabs/dotnet-mono:latest
+
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - cp ${NUGET_CONFIG} ./nuget.config
+    - python3 ./pack.py --source shared --api-username gitlab-ci-token --api-password $CI_JOB_TOKEN --project-id ${CI_PROJECT_ID} --api-url ${CI_API_V4_URL}
+  tags:
+    - docker-runner-01
