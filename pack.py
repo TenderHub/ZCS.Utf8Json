@@ -140,6 +140,8 @@ def main(args: argparse.Namespace):
 
             package_id = dom.getElementsByTagName("PackageId")
             version_id = dom.getElementsByTagName("PackageVersion")
+            if version_id is None or len(version_id) == 0:
+                continue
             version = version_id[0].firstChild.nodeValue
             package_id = package_id[0].firstChild.nodeValue
 

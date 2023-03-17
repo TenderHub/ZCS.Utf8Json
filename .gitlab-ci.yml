@@ -1,4 +1,4 @@
-image: registry.tenderhub.net/devops/docker/dotnet-sdk7/sdk:latest #pommalabs/dotnet-mono:latest
+image: registry.tenderhub.net/devops/docker/dotnet-sdk/sdk:latest #pommalabs/dotnet-mono:latest
 
 stages:
   - build
@@ -6,7 +6,7 @@ stages:
 build:
   stage: build
   script:
-    - cp ${NUGET_CONFIG} ./nuget.config
-    - python3 ./pack.py --source shared --api-username gitlab-ci-token --api-password $CI_JOB_TOKEN --project-id ${CI_PROJECT_ID} --api-url ${CI_API_V4_URL}
+    - nuget sources add -Source "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/nuget/index.json" -Name gitlab -UserName gitlab-ci-token -Password $CI_JOB_TOKEN -StorePasswordInClearText
+    - python3 ./pack.py --source gitlab --api-username gitlab-ci-token --api-password $CI_JOB_TOKEN --project-id ${CI_PROJECT_ID} --api-url ${CI_API_V4_URL}
   tags:
-    - docker-runner-01
+    - k8s
