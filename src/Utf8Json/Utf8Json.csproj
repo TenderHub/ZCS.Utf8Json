@@ -16,8 +16,8 @@
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <LangVersion>8</LangVersion>
         <PackageId>TH.Utf8Json</PackageId>
-        <Version>1.4.5</Version>
-        <PackageVersion>1.4.5</PackageVersion>
+        <Version>1.4.6</Version>
+        <PackageVersion>1.4.6</PackageVersion>
         <Title>TH.Utf8Json</Title>
         <Description>Definitely Fastest and Zero Allocation JSON Serializer for C#(NET, .NET Core, Unity, Xamarin).</Description>
         <IsPackable>true</IsPackable>
