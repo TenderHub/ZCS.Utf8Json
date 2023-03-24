@@ -65,5 +65,34 @@ namespace Utf8Json.Tests
             
             Assert.Equal(expected, map["value"]);
         }
+
+        [InlineData("{\"value\": \"Б\\Н\"}", "Б\\Н")]
+        [InlineData("{\"value\": \"A\\Because there is so much text in here\"}", "A\\Because there is so much text in here")]
+        [InlineData("{\"value\": \"A\\Because there \\is so much \\characters here\"}", "A\\Because there \\is so much \\characters here")]
+        [Theory]
+        public void ShouldHandleDoubleSlash_WhenDeserializedToDictionary(string json, string expected)
+        {
+            var resolver =
+                CompositeResolver.Create(Array.Empty<IJsonFormatter>(), new[] { StandardResolver.SnakeCase });
+            
+            var result = JsonSerializer.Deserialize<Dictionary<string, object?>>(json, resolver);
+            Assert.Equal(expected, result["value"]);
+        }
+        
+        [InlineData("{\"value\": \"Б\\Н\"}")]
+        [InlineData("{\"value\": \"A\\Because there is so much text in here\"}")]
+        [InlineData("{\"value\": \"A\\Because there \\is so much \\characters here\"}")]
+        [Theory]
+        public void ShouldHandleDoubleSlash_WhenDeserializedToWrapper(string json)
+        {
+            var resolver = CompositeResolver.Create(new IJsonFormatter[] { new RawJsonWrapperFormatter() },
+                new[] { StandardResolver.SnakeCase });
+            
+            var result = JsonSerializer.Deserialize<RawJsonWrapper>(json, resolver);
+            
+            var res = Encoding.UTF8.GetString(result);
+
+            Assert.Equal(json, res);
+        }
     }
 }

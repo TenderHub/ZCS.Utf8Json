@@ -624,7 +624,8 @@ namespace Utf8Json
                                 from = offset;
                                 continue;
                             default:
-                                throw CreateParsingExceptionMessage("Bad JSON escape.");
+                                offset++;
+                                continue;
                         }
                     case (byte)'"': // endtoken
                         offset++;
